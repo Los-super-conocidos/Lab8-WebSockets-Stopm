@@ -40,7 +40,8 @@ var app = (function () {
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/newpoint', function (eventbody) {
+            var topicId = document.getElementById("roomId").value;
+            stompClient.subscribe('/topic/newpoint.'+ topicId, function (eventbody) {
                 var theObject=JSON.parse(eventbody.body);
                 var x = theObject.x;
                 var y = theObject.y;
@@ -56,7 +57,6 @@ var app = (function () {
     return {
 
         init: function () {
-            var can = document.getElementById("canvas");
 
             //websocket connection
             connectAndSubscribe();

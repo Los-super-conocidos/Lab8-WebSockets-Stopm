@@ -29,10 +29,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
     
-    <body onload="app.init()">
+    <body>
         X:<input id="x" type="number"/>
-        Y:<input id="y" type="number"/>        
+        Y:<input id="y" type="number"/>
+        Topic Id:<input id="roomId" type="text">        
         <button onclick="app.publishPoint($('#x').val(),$('#y').val())">Send point</button>
+        <button onclick="app.init()">Connect</button>
         <canvas id="canvas" width="800" height="600" onclick="app.getMousePosition(event)"></canvas>
     </body>
 </html>
