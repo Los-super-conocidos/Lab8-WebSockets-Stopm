@@ -7,6 +7,12 @@ var app = (function () {
         }
     }
 
+    class Polygon {
+        constructor(points) {
+            this.points = points;
+        }
+    }
+
     var stompClient = null;
 
     var pointsList =  [];
@@ -17,7 +23,23 @@ var app = (function () {
         var canvas = document.getElementById("canvas");
         var ctx = canvas.getContext("2d");
         ctx.beginPath();
-        ctx.arc(point.x, point.y, 1, 0, 2 * Math.PI);
+        ctx.strokeStyle = "cyan";
+        ctx.lineWidth = 2;
+        ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+        ctx.stroke();
+    };
+
+    var addPolygonToCanvas = function (polygon) {
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.strokeStyle = "cyan";
+        ctx.moveTo(polygon[0].x, polygon[0].y);
+        for (var i = 1; i < polygon.length; i++) {
+            ctx.lineTo(polygon[i].x, polygon[i].y);
+        }
+        ctx.fill();
+        ctx.closePath();
         ctx.stroke();
     };
 
@@ -45,8 +67,12 @@ var app = (function () {
                 var theObject=JSON.parse(eventbody.body);
                 var x = theObject.x;
                 var y = theObject.y;
-                alert("Coordenadas del punto: "  + x + ", " + y);
+                //alert("Coordenadas del punto: "  + x + ", " + y);
                 addPointToCanvas(new Point(x, y));
+            });
+            stompClient.subscribe('/topic/newpolygon.' + topicId, function (eventbody) {
+                var newPolygon = JSON.parse(eventbody.body);
+                addPolygonToCanvas(newPolygon);
             });
         });
 
@@ -64,8 +90,14 @@ var app = (function () {
 
         publishPoint: function (px, py) {
             var pt = new Point(px, py);
-            stompClient.send("/topic/newpoint", {}, JSON.stringify(pt));
-            addPointToCanvas(pt);
+            var topicId = document.getElementById("roomId").value;
+            if(topicId != null){
+                stompClient.send("/app/newpoint." + topicId, {}, JSON.stringify(pt));
+                addPointToCanvas(pt);
+            }else{
+                alert("Ingrese el id de la sala a donde desea dibujar");
+            }
+                
         },
 
         getMousePosition: function (event){
